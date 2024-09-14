@@ -1,3 +1,4 @@
+
 export type GuitarT = {
   id: number;
   name: string;
@@ -21,10 +22,5 @@ export type Cart = CartItem[];
 }
 
 interface CartItemI extends GuitarI */
-
-export type GuitarProps = {
-  content: GuitarT;
-  addToCart: (item: GuitarT) => void;
-};
 
 export type GuitarID = GuitarT['id'];

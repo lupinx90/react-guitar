@@ -1,15 +1,15 @@
-import type { CartItem, GuitarID } from "../types";
+import { Dispatch } from "react";
+import { CartActions } from "../reducers/cart-reducer";
+import type { CartItem } from "../types";
+
 type HeaderProps = {
   cart: CartItem[]
-  removeFromCart: (id: GuitarID) => void
-  increaseQty: (id: GuitarID) => void
-  decreaseQty: (id: GuitarID) => void
-  emptyCart: () => void
+  dispatch: Dispatch<CartActions>
   isEmpty: boolean
   cartTotal: number
 }
 
-export function Header({ cart, removeFromCart, increaseQty, decreaseQty, emptyCart, isEmpty, cartTotal }: HeaderProps) {
+export function Header({ cart, dispatch, isEmpty, cartTotal } : HeaderProps) {
 
   return (
     <header className="py-5 header">
@@ -62,21 +62,14 @@ export function Header({ cart, removeFromCart, increaseQty, decreaseQty, emptyCa
                         <td className="flex align-items-start gap-4">
                           <button type="button"
                                   className="btn btn-dark"
-                                  onClick={() => {
-                                      if(guitar.qty === 1){
-                                        removeFromCart(guitar.id)
-                                      }else{
-                                        decreaseQty(guitar.id)
-                                      }
-                                    }
-                                  }
+                                  onClick={() => dispatch({type: 'decrease-qty', payload: {id: guitar.id}})}
                           >
                             -
                           </button>
                           {guitar.qty}
                           <button type="button"
                                   className="btn btn-dark"
-                                  onClick={() => increaseQty(guitar.id)}
+                                  onClick={() => dispatch({type: 'increase-qty', payload: {id: guitar.id}})}
                           >
                             +
                           </button>
@@ -84,7 +77,7 @@ export function Header({ cart, removeFromCart, increaseQty, decreaseQty, emptyCa
                         <td>
                           <button className="btn btn-danger" 
                                   type="button"
-                                  onClick={() => removeFromCart(guitar.id)}>
+                                  onClick={() => dispatch({type: 'remove-from-cart', payload: {id: guitar.id}})}>
                             X
                           </button>
                         </td>
@@ -96,7 +89,7 @@ export function Header({ cart, removeFromCart, increaseQty, decreaseQty, emptyCa
                   Total pagar: <span className="fw-bold">${cartTotal}</span>
                 </p>
                 <button className="btn btn-dark w-100 mt-3 p-2"
-                        onClick={emptyCart}>
+                        onClick={() => dispatch({type: 'clear-cart'})}>
                   Vaciar Carrito
                 </button>
                 </>

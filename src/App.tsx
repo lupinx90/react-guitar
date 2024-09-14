@@ -1,7 +1,8 @@
+import { useReducer, useEffect, useMemo } from "react";
 import { Header } from "./Components/Header";
 import { Guitar } from "./Components/Guitar";
-import { useCart } from "./hooks/useCart.ts";
-import { GuitarT } from "./types";
+import { CartItem, GuitarT } from "./types";
+import { cartReducer, initialState } from "./reducers/cart-reducer.ts";
 
 function App() {
   /**
@@ -16,27 +17,30 @@ function App() {
     console.log("Componente listo o escuchando por auth");
   }, [auth])
    */
+  const [state, dispatch] = useReducer(cartReducer, initialState);
 
-  const {
-    data,
-    cart,
-    addToCart,
-    increaseQty,
-    decreaseQty,
-    removeFromCart,
-    emptyCart,
-    isEmpty,
-    cartTotal
-  } = useCart();
+  useEffect(() => {
+    function saveLocalStorage(): void {
+      localStorage.setItem("cart", JSON.stringify(state.cart));
+    }
+    saveLocalStorage();
+  }, [state.cart]);
+
+  const isEmpty = useMemo(() => state.cart.length === 0, [state.cart]);
+  const cartTotal = useMemo(
+    () : number =>
+      (!isEmpty) ? state.cart.reduce(
+        (total: number, item: CartItem) => total + item.qty * item.price,
+        0
+      ) : 0,
+    [isEmpty, state.cart]
+  );
 
   return (
     <>
       <Header
-        cart={cart}
-        removeFromCart={removeFromCart}
-        increaseQty={increaseQty}
-        decreaseQty={decreaseQty}
-        emptyCart={emptyCart}
+        cart={state.cart}
+        dispatch={dispatch}
         isEmpty={isEmpty}
         cartTotal={cartTotal}
       />
@@ -44,8 +48,8 @@ function App() {
         <h2 className="text-center">Nuestra Colección</h2>
 
         <div className="row mt-5">
-          {data.map((guitar: GuitarT) => (
-            <Guitar key={guitar.id} content={guitar} addToCart={addToCart} />
+          {state?.data.map((guitar: GuitarT) => (
+            <Guitar key={guitar.id} content={guitar} dispatch={dispatch} />
           ))}
         </div>
       </main>
